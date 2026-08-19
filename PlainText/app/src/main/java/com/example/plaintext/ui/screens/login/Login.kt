@@ -1,22 +1,14 @@
 package com.example.plaintext.ui.screens.login
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
@@ -29,31 +21,26 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.plaintext.R
+import com.example.plaintext.ui.theme.PlainTextTheme
 import com.example.plaintext.ui.viewmodel.PreferencesViewModel
 
 data class LoginState(
@@ -68,8 +55,97 @@ data class LoginState(
 fun Login_screen(
     navigateToSettings: () -> Unit,
     navigateToList: () -> Unit,
-    viewModel: PreferencesViewModel = hiltViewModel()
+    modifier: Modifier = Modifier,
+    viewModel: PreferencesViewModel? = if (LocalInspectionMode.current) null else hiltViewModel()
 ) {
+    var login by remember { mutableStateOf("") }
+    var senha by remember { mutableStateOf("") }
+    var salvarInformacao by remember { mutableStateOf(false) }
+    var context = LocalContext.current
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 0.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ){
+        Row(modifier = Modifier.fillMaxWidth()
+            .background(Color(0xFF8DB600)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+
+        ){
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo",
+                modifier = Modifier.size(72.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "\"The most secure password manager\"",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = androidx.compose.ui.graphics.Color.White
+                )
+                Text(
+                    text = "Bob and Alice",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = androidx.compose.ui.graphics.Color.White
+                )
+            }
+        }
+        Text(text = "Digite suas credenciais para continuar")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = "Login:", modifier = Modifier.weight(1f))
+            OutlinedTextField(
+                value = login,
+                onValueChange = {login = it},
+                modifier = Modifier.weight(3f),
+                singleLine = true
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = "Senha:", modifier = Modifier.weight(1f))
+            OutlinedTextField(
+                value = senha,
+                onValueChange = {senha = it},
+                modifier = Modifier.weight(3f),
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation()
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Checkbox(
+                checked = salvarInformacao,
+                onCheckedChange = {salvarInformacao = it}
+            )
+            Text(text = "Salvar informações de Login")
+        }
+        Button(
+            onClick = {
+                Toast.makeText(context, "Olá", Toast.LENGTH_SHORT).show()
+            },
+            enabled = true
+        ) { Text(text = "Enviar")}
+    }
 
 }
 
@@ -99,6 +175,7 @@ fun MyAlertDialog(shouldShowDialog: MutableState<Boolean>) {
 fun TopBarComponent(
     navigateToSettings: (() -> Unit?)? = null,
     navigateToSensores: (() -> Unit?)? = null,
+    title: String,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val shouldShowDialog = remember { mutableStateOf(false) }
@@ -141,3 +218,25 @@ fun TopBarComponent(
         }
     )
 }
+
+//  Preview screen
+@Preview(showBackground = true)
+@Composable
+fun TopBarComponentPreview() {
+    PlainTextTheme {
+        TopBarComponent(title = "Plain Text")
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun logginPreview() {
+    PlainTextTheme {
+        Login_screen(
+            navigateToSettings = {},
+            navigateToList = {},
+            viewModel = null
+        )
+    }
+}
+
