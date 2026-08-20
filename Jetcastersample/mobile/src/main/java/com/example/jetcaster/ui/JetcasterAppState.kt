@@ -38,15 +38,17 @@ import androidx.navigation.compose.rememberNavController
  */
 sealed class Screen(val route: String) {
     object Home : Screen("home")
+
     object Player : Screen("player/{$ARG_EPISODE_URI}") {
         fun createRoute(episodeUri: String) = "player/$episodeUri"
     }
 
     object PodcastDetails : Screen("podcast/{$ARG_PODCAST_URI}") {
-
         val PODCAST_URI = "podcastUri"
         fun createRoute(podcastUri: String) = "podcast/$podcastUri"
     }
+
+    object Preferences : Screen("preferences")
 
     companion object {
         val ARG_PODCAST_URI = "podcastUri"
@@ -85,6 +87,12 @@ class JetcasterAppState(
         if (from.lifecycleIsResumed()) {
             val encodedUri = Uri.encode(podcastUri)
             navController.navigate(Screen.PodcastDetails.createRoute(encodedUri))
+        }
+    }
+
+    fun navigateToPreferences(from: NavBackStackEntry) {
+        if (from.lifecycleIsResumed()) {
+            navController.navigate(Screen.Preferences.route)
         }
     }
 
