@@ -1,2 +1,13 @@
-android-studio/
-android-studio-2024.*
+.idea/
+.gradle/
+.kotlin/
+
+**/.idea/
+**/.gradle/
+**/.kotlin/
+
+**/build/
+**/app/build/
+
+**/local.properties
+*.iml
