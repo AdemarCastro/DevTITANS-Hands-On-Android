@@ -89,7 +89,16 @@ fun EditInput(
 @Composable
 fun EditListPreview() {
     EditList(
-        Screen.EditList(PasswordInfo(1, "Nome", "Usuário", "Senha", "Notas")),
+        args = Screen.EditList(
+            password = PasswordInfo(
+                id = 1,
+                name = "Nome",
+                login = "Usuário",
+                password = "Senha",
+                notes = "Notas"
+            ),
+            title = "Editar Senha"
+        ),
         navigateBack = {},
         savePassword = {}
     )
