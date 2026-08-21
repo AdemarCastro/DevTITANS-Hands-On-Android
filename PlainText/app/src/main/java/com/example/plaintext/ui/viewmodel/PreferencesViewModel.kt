@@ -22,6 +22,7 @@ data class PreferencesState(
 class PreferencesViewModel @Inject constructor(
     handle: SavedStateHandle,
 ) : ViewModel() {
+    //val senhaState: Any
     var preferencesState by mutableStateOf(PreferencesState(login = "devtitans", password = "123", preencher = true))
         private set
 

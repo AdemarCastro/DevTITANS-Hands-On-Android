@@ -3,6 +3,7 @@ package com.example.plaintext.ui.screens.list
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +40,10 @@ import com.example.plaintext.ui.viewmodel.ListViewModel
 import com.example.plaintext.ui.viewmodel.ListViewState
 import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.plaintext.data.model.PasswordInfo
@@ -74,7 +78,10 @@ fun ListItemContent(
             else -> {
                 LazyColumn(
                     modifier = modifier
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+
                 ) {
                     items(listState.passwordList.size) {
                         ListItem(
@@ -117,7 +124,9 @@ fun ListItem(
         Image(
             painter = painterResource(id = R.drawable.ic_launcher_foreground),
             contentDescription = "Logo",
-            modifier = Modifier.fillMaxHeight()
+
+            modifier = Modifier.fillMaxHeight().clip(CircleShape).background(Color(0xFF4CAF50))
+
         )
         Column(
             modifier = Modifier
@@ -130,6 +139,27 @@ fun ListItem(
         Icon(
             Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Menu",
             tint = Color.White
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun ListViewScreenPreview() {
+    val mockList = listOf(
+        PasswordInfo(id = 1, name = "Twitter", login = "dev", password = "123", notes = ""),
+        PasswordInfo(id = 2, name = "Facebook", login = "devtitans", password = "456", notes = ""),
+        PasswordInfo(id = 3, name = "Moodle", login = "dev.com", password = "789", notes = "")
+    )
+
+    Scaffold(
+        topBar = { TopBarComponent(title = "PlainText") }
+    ) { padding ->
+        ListItemContent(
+            modifier = Modifier.padding(padding),
+            listState = ListViewState(isCollected = true, passwordList = mockList),
+            navigateToEdit = {}
         )
     }
 }
