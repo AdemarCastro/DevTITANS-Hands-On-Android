@@ -6,9 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plaintext.data.model.PasswordInfo
+import com.example.plaintext.data.model.toPasswordInfo
 import com.example.plaintext.data.repository.PasswordDBStore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,7 +26,6 @@ open class ListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            // TODO: depende da task 6 (Password.toPasswordInfo()) — Password ainda só tem o campo "id"
             passwordDBStore.getList().collect { passwords ->
                 listViewState = listViewState.copy(
                     passwordList = passwords.map { it.toPasswordInfo() },
