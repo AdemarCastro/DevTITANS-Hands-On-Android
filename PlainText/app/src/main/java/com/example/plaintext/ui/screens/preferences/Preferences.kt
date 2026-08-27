@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import com.example.plaintext.ui.screens.login.TopBarComponent
 import com.example.plaintext.ui.screens.util.PreferenceInput
 import com.example.plaintext.ui.screens.util.PreferenceItem
+import com.example.plaintext.ui.viewmodel.PreferencesState
 import com.example.plaintext.ui.viewmodel.PreferencesViewModel
 
 
@@ -35,6 +36,8 @@ fun SettingsScreen(
 @Composable
 fun SettingsContent(modifier: Modifier = Modifier,
                     viewModel: PreferencesViewModel? = null) {
+    val state = viewModel?.preferencesState ?: PreferencesStatePreview
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -44,38 +47,44 @@ fun SettingsContent(modifier: Modifier = Modifier,
         PreferenceInput(
             title = "Preencher Login",
             label = "Login",
-            fieldValue = "",
+            fieldValue = state.login,
             summary = "Preencher login na tela inicial"
         ){
-            // função para alterar o login
+            viewModel?.updateLogin(it)
         }
 
         PreferenceInput(
             title = "Setar Senha",
-            label = "Label",
-            fieldValue = "",
+            label = "Senha",
+            fieldValue = state.password,
             summary = "Senha para entrar no sistema"
         ){
-            // função para alterar a senha
+            viewModel?.updatePassword(it)
         }
 
         PreferenceItem(
             title = "Preencher Login",
             summary = "Preencher login na tela inicial",
             onClick = {
-                // deve alterar o estado que representa se o switch está ligado ou não
+                viewModel?.updatePreencher(!state.preencher)
             },
             control = {
                 Switch(
-                    checked = false, // deve ler o estado que representa se o switch está ligado ou não
+                    checked = state.preencher,
                     onCheckedChange = {
-                        // deve alterar o estado que representa se o switch está ligado ou não
+                        viewModel?.updatePreencher(it)
                     }
                 )
             }
         )
     }
 }
+
+private val PreferencesStatePreview = PreferencesState(
+    login = "devtitans",
+    password = "123",
+    preencher = true
+)
 
 @Preview(showBackground = true)
 @Composable

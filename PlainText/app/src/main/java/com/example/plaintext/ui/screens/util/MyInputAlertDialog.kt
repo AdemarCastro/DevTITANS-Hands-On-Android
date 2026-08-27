@@ -25,7 +25,9 @@ fun MyInputAlertDialog(
     onFinish: ((field: String) -> Unit)? = null
 ) {
     val defaultValue = fieldValue ?: ""
-    val field = remember { mutableStateOf(TextFieldValue(defaultValue, TextRange(defaultValue.length))) }
+    val field = remember(fieldValue) {
+        mutableStateOf(TextFieldValue(defaultValue, TextRange(defaultValue.length)))
+    }
     val focusRequester = remember { FocusRequester() }
 
     if (shouldShowDialog.value) {

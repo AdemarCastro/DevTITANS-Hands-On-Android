@@ -1,13 +1,10 @@
 package com.example.plaintext.ui.screens.list
 
-import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,7 +19,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,24 +29,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.plaintext.R
 import com.example.plaintext.ui.screens.login.TopBarComponent
 import com.example.plaintext.ui.viewmodel.ListViewModel
 import com.example.plaintext.ui.viewmodel.ListViewState
-import androidx.compose.foundation.overscroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.plaintext.data.model.PasswordInfo
 
 @Composable
 fun ListView(
-) {}
+    listState: ListViewState,
+    navigateToEdit: (password: PasswordInfo) -> Unit,
+    navigateToAdd: () -> Unit,
+    navigateToSettings: (() -> Unit)? = null
+) {
+    Scaffold(
+        topBar = {
+            TopBarComponent(
+                title = "PlainText",
+                navigateToSettings = navigateToSettings
+            )
+        },
+        floatingActionButton = {
+            AddButton(onClick = navigateToAdd)
+        }
+    ) { paddingValues ->
+        ListItemContent(
+            modifier = Modifier.padding(paddingValues),
+            listState = listState,
+            navigateToEdit = navigateToEdit
+        )
+    }
+}
 
 @Composable
 fun AddButton(onClick: () -> Unit) {
@@ -153,14 +165,10 @@ fun ListViewScreenPreview() {
         PasswordInfo(id = 3, name = "Moodle", login = "dev.com", password = "789", notes = "")
     )
 
-    Scaffold(
-        topBar = { TopBarComponent(title = "PlainText") }
-    ) { padding ->
-        ListItemContent(
-            modifier = Modifier.padding(padding),
-            listState = ListViewState(isCollected = true, passwordList = mockList),
-            navigateToEdit = {}
-        )
-    }
+    ListView(
+        listState = ListViewState(isCollected = true, passwordList = mockList),
+        navigateToEdit = {},
+        navigateToAdd = {}
+    )
 }
 

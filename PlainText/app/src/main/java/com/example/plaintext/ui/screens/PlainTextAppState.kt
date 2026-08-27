@@ -80,7 +80,12 @@ class PlainTextAppState(
     fun navigateToList() {
         navController.navigate(
             Screen.List
-        )
+        ) {
+            popUpTo(Screen.Login) {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
     }
 
     fun navigateToEditList(
