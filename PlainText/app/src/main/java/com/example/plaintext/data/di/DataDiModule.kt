@@ -3,6 +3,7 @@ package com.example.plaintext.data.di
 import android.content.Context
 import androidx.room.Room
 import com.example.plaintext.data.PlainTextDatabase
+import com.example.plaintext.data.Migrations.MIGRATION_1_2
 import com.example.plaintext.data.dao.PasswordDao
 import com.example.plaintext.data.repository.LocalPasswordDBStore
 import com.example.plaintext.data.repository.PasswordDBStore
@@ -25,7 +26,7 @@ object DataDiModule {
         context,
         PlainTextDatabase::class.java,
         "plaintext-database"
-    ).build()
+    ).addMigrations(MIGRATION_1_2).build()
 
     @Provides
     @Singleton

@@ -19,7 +19,7 @@ data class Password(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "login") val login: String,
     @ColumnInfo(name = "password") val password: String,
-    @ColumnInfo(name = "notes") val notes: String,
+    @ColumnInfo(name = "notes") val notes: String? = null,
 )
 
 @Serializable
@@ -29,7 +29,7 @@ data class PasswordInfo(
     val name: String,
     val login: String,
     val password: String,
-    val notes: String,
+    val notes: String? = null,
 ) : Parcelable {
     operator fun getValue(nothing: Nothing?, property: KProperty<*>): Password =
         Password(

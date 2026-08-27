@@ -21,9 +21,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.plaintext.R
 import com.example.plaintext.ui.theme.PlainTextTheme
+import com.example.plaintext.ui.viewmodel.LoginViewModel
 import com.example.plaintext.ui.viewmodel.PreferencesViewModel
 
 data class LoginState(
@@ -56,19 +59,36 @@ fun Login_screen(
     navigateToSettings: () -> Unit,
     navigateToList: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PreferencesViewModel? = if (LocalInspectionMode.current) null else hiltViewModel()
+    viewModel: PreferencesViewModel? = if (LocalInspectionMode.current) null else hiltViewModel(),
+    loginViewModel: LoginViewModel? = if (LocalInspectionMode.current) null else hiltViewModel()
 ) {
-    var login by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
-    var salvarInformacao by remember { mutableStateOf(false) }
-    var context = LocalContext.current
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 0.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
+    val configuredLogin = viewModel?.preferencesState?.login.orEmpty()
+    val shouldPrefillLogin = viewModel?.preferencesState?.preencher == true
+
+    LaunchedEffect(configuredLogin, shouldPrefillLogin) {
+        loginViewModel?.updateLogin(if (shouldPrefillLogin) configuredLogin else "")
+    }
+
+    val login = loginViewModel?.loginViewState?.login.orEmpty()
+    val senha = loginViewModel?.loginViewState?.senha.orEmpty()
+    val salvarInformacao = loginViewModel?.loginViewState?.salvarInformacao == true
+    val context = LocalContext.current
+    Scaffold(
+        topBar = {
+            TopBarComponent(
+                navigateToSettings = navigateToSettings,
+                title = "Plain Text"
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(paddingValues)
+                .padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 0.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ){
         Row(modifier = Modifier.fillMaxWidth()
             .background(Color(0xFF8DB600)),
             verticalAlignment = Alignment.CenterVertically,
@@ -107,7 +127,7 @@ fun Login_screen(
             Text(text = "Login:", modifier = Modifier.weight(1f))
             OutlinedTextField(
                 value = login,
-                onValueChange = {login = it},
+                onValueChange = { loginViewModel?.updateLogin(it) },
                 modifier = Modifier.weight(3f),
                 singleLine = true
             )
@@ -122,7 +142,7 @@ fun Login_screen(
             Text(text = "Senha:", modifier = Modifier.weight(1f))
             OutlinedTextField(
                 value = senha,
-                onValueChange = {senha = it},
+                onValueChange = { loginViewModel?.updateSenha(it) },
                 modifier = Modifier.weight(3f),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation()
@@ -135,16 +155,27 @@ fun Login_screen(
         ) {
             Checkbox(
                 checked = salvarInformacao,
-                onCheckedChange = {salvarInformacao = it}
+                onCheckedChange = { loginViewModel?.updateSalvarInformacao(it) }
             )
             Text(text = "Salvar informações de Login")
         }
         Button(
             onClick = {
-                Toast.makeText(context, "Olá", Toast.LENGTH_SHORT).show()
+                val credentialsAreValid = viewModel?.checkCredentials(login, senha) == true
+
+                if (credentialsAreValid) {
+                    navigateToList()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Login/Senha invalidos",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             },
             enabled = true
         ) { Text(text = "Enviar")}
+        }
     }
 
 }
@@ -173,8 +204,8 @@ fun MyAlertDialog(shouldShowDialog: MutableState<Boolean>) {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun TopBarComponent(
-    navigateToSettings: (() -> Unit?)? = null,
-    navigateToSensores: (() -> Unit?)? = null,
+    navigateToSettings: (() -> Unit)? = null,
+    navigateToSensores: (() -> Unit)? = null,
     title: String,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -187,7 +218,7 @@ fun TopBarComponent(
     TopAppBar(
         title = { Text("PlainText") },
         actions = {
-            if (navigateToSettings != null && navigateToSensores != null) {
+            if (navigateToSettings != null || navigateToSensores != null) {
                 IconButton(onClick = { expanded = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "Menu")
                 }
@@ -195,14 +226,16 @@ fun TopBarComponent(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    DropdownMenuItem(
-                        text = { Text("Configurações") },
-                        onClick = {
-                            navigateToSettings();
-                            expanded = false;
-                        },
-                        modifier = Modifier.padding(8.dp)
-                    )
+                    navigateToSettings?.let { navigate ->
+                        DropdownMenuItem(
+                            text = { Text("Configurações") },
+                            onClick = {
+                                navigate()
+                                expanded = false
+                            },
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
                     DropdownMenuItem(
                         text = {
                             Text("Sobre");
