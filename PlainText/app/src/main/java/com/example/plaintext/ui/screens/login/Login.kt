@@ -41,7 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.plaintext.R
 import com.example.plaintext.ui.theme.PlainTextTheme
-import com.example.plaintext.ui.viewmodel.PreferencesViewModel
+//import com.example.plaintext.ui.viewmodel.PreferencesViewModel
+import com.example.plaintext.ui.viewmodel.LoginViewModel
 
 data class LoginState(
     val preencher: Boolean,
@@ -56,12 +57,16 @@ fun Login_screen(
     navigateToSettings: () -> Unit,
     navigateToList: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PreferencesViewModel? = if (LocalInspectionMode.current) null else hiltViewModel()
+    viewModel: LoginViewModel? = if (LocalInspectionMode.current) null else hiltViewModel()
 ) {
-    var login by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
-    var salvarInformacao by remember { mutableStateOf(false) }
-    var context = LocalContext.current
+//    var login by remember { mutableStateOf("") }
+//    var senha by remember { mutableStateOf("") }
+//    var salvarInformacao by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val login = viewModel?.loginViewState?.login ?: ""
+    val senha = viewModel?.loginViewState?.senha ?: ""
+    val salvarInformacao = viewModel?.loginViewState?.salvarInformacao ?: false
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -104,10 +109,12 @@ fun Login_screen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
+      //------------------------------------------------------ login e senha
             Text(text = "Login:", modifier = Modifier.weight(1f))
             OutlinedTextField(
                 value = login,
-                onValueChange = {login = it},
+                onValueChange = { viewModel?.updateLogin(it) },
                 modifier = Modifier.weight(3f),
                 singleLine = true
             )
@@ -122,7 +129,8 @@ fun Login_screen(
             Text(text = "Senha:", modifier = Modifier.weight(1f))
             OutlinedTextField(
                 value = senha,
-                onValueChange = {senha = it},
+                onValueChange = { viewModel?.updateSenha(it) },
+     //----------------------------------------------------
                 modifier = Modifier.weight(3f),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation()
@@ -133,9 +141,12 @@ fun Login_screen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
+        //---------Checkbox atualizado-----------------
             Checkbox(
                 checked = salvarInformacao,
-                onCheckedChange = {salvarInformacao = it}
+                onCheckedChange = {
+                    viewModel?.updateSalvarInformacao(it)
+                }
             )
             Text(text = "Salvar informações de Login")
         }
